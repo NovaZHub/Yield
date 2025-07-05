@@ -1,6 +1,55 @@
---// BOTÃO FLUTUANTE COM IMAGEM HACKER
+--// INTRO COM EFEITO DIGITANDO - NovaZHub
+local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
+local PlayerGui = player:WaitForChild("PlayerGui")
+
+local introGui = Instance.new("ScreenGui")
+introGui.Name = "NovaZHubIntro"
+introGui.IgnoreGuiInset = true
+introGui.ResetOnSpawn = false
+introGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+introGui.Parent = PlayerGui
+
+local bg = Instance.new("Frame")
+bg.BackgroundColor3 = Color3.new(0, 0, 0)
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.Parent = introGui
+bg.ZIndex = 5
+
+local label = Instance.new("TextLabel")
+label.Size = UDim2.new(1, 0, 1, 0)
+label.BackgroundTransparency = 1
+label.TextColor3 = Color3.fromRGB(0, 255, 128)
+label.Font = Enum.Font.Code
+label.TextScaled = true
+label.Text = ""
+label.ZIndex = 6
+label.Parent = bg
+
+local typingSound = Instance.new("Sound", bg)
+typingSound.SoundId = "rbxassetid://9118823100"
+typingSound.Volume = 1
+
+local fullText = "NovaZHub"
+local delayPerChar = 0.12
+
+task.spawn(function()
+	for i = 1, #fullText do
+		label.Text = string.sub(fullText, 1, i)
+		typingSound:Play()
+		task.wait(delayPerChar)
+	end
+end)
+
+task.delay(#fullText * delayPerChar + 1, function()
+	TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
+	TweenService:Create(bg, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+	task.wait(1)
+	introGui:Destroy()
+end)
+
+--// BOTÃO FLUTUANTE
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "ToggleButtonGui"
 screenGui.ResetOnSpawn = false
@@ -29,7 +78,7 @@ end)
 
 --// RAYFIELD GUI
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-local Window = Rayfield:CreateWindow({ Name = "Prefeito Hub 😎", ConfigurationSaving = { Enabled = false } })
+local Window = Rayfield:CreateWindow({ Name = "NovaZHub 😎", ConfigurationSaving = { Enabled = false } })
 
 local GUIVisible = true
 openButton.MouseButton1Click:Connect(function()
@@ -38,12 +87,17 @@ openButton.MouseButton1Click:Connect(function()
 	Window:SetVisible(GUIVisible)
 end)
 
---// ABA MAIN
+--// TABS
 local MainTab = Window:CreateTab("Main", 4483362458)
-local RunService = game:GetService("RunService")
-local ESPConnection
+local GeneratorTab = Window:CreateTab("Generators", 4483362458)
 
--- ESP HAWK TUAH
+--// DEPENDÊNCIAS
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+
+--// ESP HAWK TUAH
+local ESPConnection
 local function createOutlineESP(model, outlineColor, fillColor)
 	if not model:FindFirstChildOfClass("Highlight") then
 		local h = Instance.new("Highlight", model)
@@ -123,8 +177,7 @@ MainTab:CreateToggle({
 	end
 })
 
--- INFINITE STAMINA
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+--// INFINITE STAMINA
 local staminaThread
 MainTab:CreateToggle({
 	Name = "Infinite Stamina",
@@ -145,7 +198,7 @@ MainTab:CreateToggle({
 	end
 })
 
--- TOOL ESP (Medkit, BloxyCola)
+--// TOOL ESP
 local toolhighlightActive = false
 local function highlighttools(state)
 	toolhighlightActive = state
@@ -181,17 +234,41 @@ MainTab:CreateToggle({
 	end
 })
 
--- ABA GENERATORS
-local GeneratorTab = Window:CreateTab("Generators", 4483362458)
+--// ESP GENERATOR
+local generatorESPEnabled = false
+local generatorHighlights = {}
+local function toggleGeneratorESP(state)
+	generatorESPEnabled = state
+	for _, h in pairs(generatorHighlights) do h:Destroy() end
+	table.clear(generatorHighlights)
+	if state then
+		for _, gen in pairs(workspace.Map.Ingame.Map:GetChildren()) do
+			if gen:IsA("Model") and gen.Name == "Generator" then
+				local highlight = Instance.new("Highlight", gen)
+				highlight.FillColor = Color3.fromRGB(255, 255, 0)
+				highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
+				highlight.FillTransparency = 0.5
+				table.insert(generatorHighlights, highlight)
+			end
+		end
+	end
+end
+
+GeneratorTab:CreateToggle({
+	Name = "ESP Generator",
+	CurrentValue = false,
+	Callback = toggleGeneratorESP
+})
+
+--// AUTO GENERATOR
 local runAutoGen = false
 local autoGenThread = nil
-
 local function isSafeGenerator(gen)
 	return gen:FindFirstChild("Remotes") and gen.Remotes:FindFirstChild("RE")
 end
 
 local function getRandomDelay()
-	return math.random(4, 7) / 10 -- 0.4 a 0.7 segundos
+	return math.random(4, 7) / 10
 end
 
 local function safeActivate(gen)
