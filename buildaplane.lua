@@ -5,9 +5,9 @@ local AutoFarm = false
 
 -- Criar Janela
 local Window = Rayfield:CreateWindow({
-    Name = "NOVAZHUB| Build a Plane",
-    LoadingTitle = "Build A Boat Hub",
-    LoadingSubtitle = "By Carlos",
+    Name = "NovaZHub| Auto Farm  💀",
+    LoadingTitle = "Build a plane Hub",
+    LoadingSubtitle = "NovaZHub",
     ConfigurationSaving = {
         Enabled = true,
         FolderName = "BABFT_AutoFarm", -- Salvar configs
@@ -68,4 +68,31 @@ MainTab:CreateToggle({
             })
         end
     end
+})
+
+-- Aba 'Grup' com links para grupos do WhatsApp
+local GrupTab = Window:CreateTab("Grup", 4483362458)
+
+GrupTab:CreateButton({
+    Name = "Grupo WhatsApp 🇧🇷 Comunidade BR",
+    Callback = function()
+        setclipboard("https://chat.whatsapp.com/C54lAZeVHDb2lRfFGKZGUm?mode=ac_t")
+        Rayfield:Notify({
+            Title = "Link BR Copiado!",
+            Content = "Abra o navegador e cole o link para entrar no grupo BR.",
+            Duration = 5
+        })
+    end,
+})
+
+GrupTab:CreateButton({
+    Name = "Grupo WhatsApp 🇺🇸 USA Community",
+    Callback = function()
+        setclipboard("https://chat.whatsapp.com/EnnQ58Rt7bvDzHA8LXu7ZE?mode=ac_t")
+        Rayfield:Notify({
+            Title = "USA Link Copied!",
+            Content = "Open your browser and paste the link to join the USA group.",
+            Duration = 5
+        })
+    end,
 })
