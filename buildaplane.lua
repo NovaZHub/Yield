@@ -2,15 +2,16 @@
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
 local AutoFarm = false
+local AutoBuyItens = false
 
 -- Criar Janela
 local Window = Rayfield:CreateWindow({
-    Name = "NovaZHub| Auto Farm  💀",
-    LoadingTitle = "Build a plane Hub",
+    Name = "NovaZHub | Auto Farm 💀",
+    LoadingTitle = "Build a Plane Hub",
     LoadingSubtitle = "NovaZHub",
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "BABFT_AutoFarm", -- Salvar configs
+        FolderName = "BABFT_AutoFarm",
         FileName = "AutoFarmRayfield"
     },
     Discord = {
@@ -22,7 +23,6 @@ local Window = Rayfield:CreateWindow({
 -- Aba principal
 local MainTab = Window:CreateTab("Main", 4483362458)
 
--- Toggle do Auto Farm
 MainTab:CreateToggle({
     Name = "Ativar Auto Farm 💀",
     CurrentValue = false,
@@ -70,29 +70,55 @@ MainTab:CreateToggle({
     end
 })
 
--- Aba 'Grup' com links para grupos do WhatsApp
-local GrupTab = Window:CreateTab("Grup", 4483362458)
+-- Aba Itens
+local ItensTab = Window:CreateTab("Itens", 4483362458)
 
-GrupTab:CreateButton({
-    Name = "Grupo WhatsApp 🇧🇷 Comunidade BR",
-    Callback = function()
-        setclipboard("https://chat.whatsapp.com/C54lAZeVHDb2lRfFGKZGUm?mode=ac_t")
-        Rayfield:Notify({
-            Title = "Link BR Copiado!",
-            Content = "Abra o navegador e cole o link para entrar no grupo BR.",
-            Duration = 5
-        })
-    end,
-})
+ItensTab:CreateToggle({
+    Name = "Auto Buy Todos os Itens 🧱",
+    CurrentValue = false,
+    Flag = "AutoBuyItensToggle",
+    Callback = function(Value)
+        AutoBuyItens = Value
 
-GrupTab:CreateButton({
-    Name = "Grupo WhatsApp 🇺🇸 USA Community",
-    Callback = function()
-        setclipboard("https://chat.whatsapp.com/EnnQ58Rt7bvDzHA8LXu7ZE?mode=ac_t")
-        Rayfield:Notify({
-            Title = "USA Link Copied!",
-            Content = "Open your browser and paste the link to join the USA group.",
-            Duration = 5
-        })
-    end,
+        if AutoBuyItens then
+            Rayfield:Notify({
+                Title = "Auto Buy Ativado",
+                Content = "Comprando itens repetidamente...",
+                Duration = 5
+            })
+
+            task.spawn(function()
+                while AutoBuyItens do
+                    local items = {
+                        "block_1", "wing_1", "fuel_1", "propeller_1", "seat_1", "fuel_2",
+                        "wing_2", "fuel_3", "propeller_2", "balloon", "boost_1",
+                        "missile_1", "shield"
+                    }
+
+                    for _, item in ipairs(items) do
+                        local args = {item}
+                        local success, err = pcall(function()
+                            game:GetService("ReplicatedStorage")
+                                :WaitForChild("Remotes")
+                                :WaitForChild("ShopEvents")
+                                :WaitForChild("BuyBlock")
+                                :FireServer(unpack(args))
+                        end)
+                        if not success then
+                            warn("Erro ao comprar item:", err)
+                        end
+                        task.wait(0.1)
+                    end
+
+                    task.wait(1)
+                end
+            end)
+        else
+            Rayfield:Notify({
+                Title = "Auto Buy Desativado",
+                Content = "Parado de comprar itens.",
+                Duration = 4
+            })
+        end
+    end
 })
