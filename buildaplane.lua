@@ -122,3 +122,62 @@ ItensTab:CreateToggle({
         end
     end
 })
+
+-- Aba Blood Moon
+local BloodMoonTab = Window:CreateTab("Blood Moon", 4483362458)
+
+local AutoBloodMoon = false
+local r = game:GetService("ReplicatedStorage").Remotes
+
+BloodMoonTab:CreateToggle({
+    Name = "Auto GET Inf Blood coin and spin",
+    CurrentValue = false,
+    Flag = "AutoBloodMoonToggle",
+    Callback = function(Value)
+        AutoBloodMoon = Value
+
+        if AutoBloodMoon then
+            Rayfield:Notify({
+                Title = "Blood Moon Ativado",
+                Content = "Auto GET Inf Blood coin and spin ligado.",
+                Duration = 5
+            })
+
+            -- Spawn Evil Eye e Kill Evil Eye em paralelo
+            task.spawn(function()
+                for i = 1, 303 do
+                    task.spawn(function()
+                        while AutoBloodMoon do
+                            task.wait()
+                            pcall(function()
+                                r.EventEvents.SpawnEvilEye:InvokeServer()
+                                r.EventEvents.KillEvilEye:InvokeServer()
+                            end)
+                        end
+                    end)
+                end
+            end)
+
+            -- Purchase Spin e Perform Spin em paralelo
+            task.spawn(function()
+                for i = 1, 80 do
+                    task.spawn(function()
+                        while AutoBloodMoon do
+                            task.wait()
+                            pcall(function()
+                                r.SpinEvents.PurchaseSpin:InvokeServer()
+                                r.SpinEvents.PerformSpin:InvokeServer()
+                            end)
+                        end
+                    end)
+                end
+            end)
+        else
+            Rayfield:Notify({
+                Title = "Blood Moon Desativado",
+                Content = "Auto GET Inf Blood coin and spin desligado.",
+                Duration = 4
+            })
+        end
+    end
+})
