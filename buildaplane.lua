@@ -24,7 +24,7 @@ local Window = Rayfield:CreateWindow({
 local MainTab = Window:CreateTab("Main", 4483362458)
 
 MainTab:CreateToggle({
-    Name = "Ativar Auto Farm 💀",
+    Name = "Auto farm Not Working",
     CurrentValue = false,
     Flag = "AutoFarmToggle",
     Callback = function(Value)
@@ -130,7 +130,8 @@ local AutoBloodMoon = false
 local r = game:GetService("ReplicatedStorage").Remotes
 
 BloodMoonTab:CreateToggle({
-    Name = "Auto GET Inf Blood coin and spin",
+    Name = "Auto-pick up Blood Moon items
+still working!",
     CurrentValue = false,
     Flag = "AutoBloodMoonToggle",
     Callback = function(Value)
