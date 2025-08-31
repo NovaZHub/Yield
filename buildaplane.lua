@@ -29,19 +29,12 @@ MainTab:CreateToggle({
     Flag = "AutoFarmToggle",
     Callback = function(Value)
         AutoFarm = Value
-
         if AutoFarm then
-            Rayfield:Notify({
-                Title = "Auto Farm Ativado",
-                Content = "Farmando infinitamente...",
-                Duration = 5
-            })
-
+            Rayfield:Notify({Title = "Auto Farm Ativado", Content = "Farmando infinitamente...", Duration = 5})
             task.spawn(function()
                 while AutoFarm do
                     local ReplicatedStorage = game:GetService("ReplicatedStorage")
                     local Players = game:GetService("Players")
-
                     local LaunchRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("LaunchEvents"):WaitForChild("Launch")
                     local ReturnRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("LaunchEvents"):WaitForChild("Return")
 
@@ -61,11 +54,7 @@ MainTab:CreateToggle({
                 end
             end)
         else
-            Rayfield:Notify({
-                Title = "Auto Farm Desativado",
-                Content = "Farm parado!",
-                Duration = 4
-            })
+            Rayfield:Notify({Title = "Auto Farm Desativado", Content = "Farm parado!", Duration = 4})
         end
     end
 })
@@ -79,46 +68,22 @@ ItensTab:CreateToggle({
     Flag = "AutoBuyItensToggle",
     Callback = function(Value)
         AutoBuyItens = Value
-
         if AutoBuyItens then
-            Rayfield:Notify({
-                Title = "Auto Buy Ativado",
-                Content = "Comprando itens repetidamente...",
-                Duration = 5
-            })
-
+            Rayfield:Notify({Title = "Auto Buy Ativado", Content = "Comprando itens repetidamente...", Duration = 5})
             task.spawn(function()
                 while AutoBuyItens do
-                    local items = {
-                        "block_1", "wing_1", "fuel_1", "propeller_1", "seat_1", "fuel_2",
-                        "wing_2", "fuel_3", "propeller_2", "balloon", "boost_1",
-                        "missile_1", "shield"
-                    }
-
+                    local items = {"block_1","wing_1","fuel_1","propeller_1","seat_1","fuel_2","wing_2","fuel_3","propeller_2","balloon","boost_1","missile_1","shield"}
                     for _, item in ipairs(items) do
-                        local args = {item}
-                        local success, err = pcall(function()
-                            game:GetService("ReplicatedStorage")
-                                :WaitForChild("Remotes")
-                                :WaitForChild("ShopEvents")
-                                :WaitForChild("BuyBlock")
-                                :FireServer(unpack(args))
+                        pcall(function()
+                            game:GetService("ReplicatedStorage").Remotes.ShopEvents.BuyBlock:FireServer(item)
                         end)
-                        if not success then
-                            warn("Erro ao comprar item:", err)
-                        end
                         task.wait(0.1)
                     end
-
                     task.wait(1)
                 end
             end)
         else
-            Rayfield:Notify({
-                Title = "Auto Buy Desativado",
-                Content = "Parado de comprar itens.",
-                Duration = 4
-            })
+            Rayfield:Notify({Title = "Auto Buy Desativado", Content = "Parado de comprar itens.", Duration = 4})
         end
     end
 })
@@ -135,15 +100,9 @@ BloodMoonTab:CreateToggle({
     Flag = "AutoBloodMoonToggle",
     Callback = function(Value)
         AutoBloodMoon = Value
-
         if AutoBloodMoon then
-            Rayfield:Notify({
-                Title = "Blood Moon Ativado",
-                Content = "Auto GET Inf Blood coin and spin ligado.",
-                Duration = 5
-            })
+            Rayfield:Notify({Title = "Blood Moon Ativado", Content = "Auto GET Inf Blood coin and spin ligado.", Duration = 5})
 
-            -- Spawn Evil Eye e Kill Evil Eye em paralelo
             task.spawn(function()
                 for i = 1, 303 do
                     task.spawn(function()
@@ -158,7 +117,6 @@ BloodMoonTab:CreateToggle({
                 end
             end)
 
-            -- Purchase Spin e Perform Spin em paralelo
             task.spawn(function()
                 for i = 1, 80 do
                     task.spawn(function()
@@ -173,11 +131,120 @@ BloodMoonTab:CreateToggle({
                 end
             end)
         else
-            Rayfield:Notify({
-                Title = "Blood Moon Desativado",
-                Content = "Auto GET Inf Blood coin and spin desligado.",
-                Duration = 4
-            })
+            Rayfield:Notify({Title = "Blood Moon Desativado", Content = "Auto GET Inf Blood coin and spin desligado.", Duration = 4})
+        end
+    end
+})
+
+-- Aba Misc
+local MiscTab = Window:CreateTab("Misc", 4483362458)
+
+-- Anti AFK
+MiscTab:CreateToggle({
+    Name = "Anti AFK",
+    CurrentValue = false,
+    Flag = "AntiAFKToggle",
+    Callback = function(Value)
+        if Value then
+            getgenv().AntiAFKConnection = game:GetService("Players").LocalPlayer.Idled:Connect(function()
+                game:GetService("VirtualUser"):Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+                task.wait(1)
+                game:GetService("VirtualUser"):Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+            end)
+        else
+            if getgenv().AntiAFKConnection then
+                getgenv().AntiAFKConnection:Disconnect()
+                getgenv().AntiAFKConnection = nil
+            end
+        end
+    end
+})
+
+-- Fullbright
+MiscTab:CreateToggle({
+    Name = "Fullbright",
+    CurrentValue = false,
+    Flag = "FullbrightToggle",
+    Callback = function(Value)
+        if Value then
+            getgenv().Fullbright = true
+            task.spawn(function()
+                while getgenv().Fullbright do
+                    game:GetService("Lighting").Brightness = 2
+                    game:GetService("Lighting").ClockTime = 14
+                    game:GetService("Lighting").FogEnd = 100000
+                    game:GetService("Lighting").GlobalShadows = false
+                    game:GetService("Lighting").OutdoorAmbient = Color3.fromRGB(128,128,128)
+                    task.wait(0.5)
+                end
+            end)
+        else
+            getgenv().Fullbright = false
+        end
+    end
+})
+
+-- No Fog
+MiscTab:CreateToggle({
+    Name = "No Fog",
+    CurrentValue = false,
+    Flag = "NoFogToggle",
+    Callback = function(Value)
+        if Value then
+            getgenv().NoFog = true
+            task.spawn(function()
+                while getgenv().NoFog do
+                    game:GetService("Lighting").FogStart = 0
+                    game:GetService("Lighting").FogEnd = 100000
+                    task.wait(0.5)
+                end
+            end)
+        else
+            getgenv().NoFog = false
+        end
+    end
+})
+
+-- Anti Cheat (70~80%)
+MiscTab:CreateToggle({
+    Name = "Anti Cheat",
+    CurrentValue = false,
+    Flag = "AntiCheatToggle",
+    Callback = function(Value)
+        if Value then
+            getgenv().AntiCheat = true
+            Rayfield:Notify({Title = "Anti Cheat", Content = "Proteção ativada (70~80%).", Duration = 6})
+
+            -- Bloqueia Kick
+            local mt = getrawmetatable(game)
+            setreadonly(mt, false)
+            local old = mt.__namecall
+            mt.__namecall = newcclosure(function(self, ...)
+                local method = getnamecallmethod()
+                if method == "Kick" or method == "kick" then
+                    return nil
+                end
+                return old(self, ...)
+            end)
+
+            -- Bloqueia Remotes suspeitos
+            local oldFireServer
+            oldFireServer = hookfunction(Instance.new("RemoteEvent").FireServer, function(self, ...)
+                local args = {...}
+                if tostring(self):lower():find("anticheat") or tostring(self):lower():find("log") then
+                    return nil
+                end
+                return oldFireServer(self, unpack(args))
+            end)
+
+            -- Delay random para loops
+            getgenv().SafeWait = function(min, max)
+                local t = math.random(min*100, max*100) / 100
+                task.wait(t)
+            end
+        else
+            getgenv().AntiCheat = false
+            Rayfield:Notify({Title = "Anti Cheat", Content = "Proteção desligada.", Duration = 4})
         end
     end
 })
