@@ -78,7 +78,7 @@ end)
 
 --// RAYFIELD GUI
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-local Window = Rayfield:CreateWindow({ Name = "NovaZHub 😎", ConfigurationSaving = { Enabled = false } })
+local Window = Rayfield:CreateWindow({ Name = "LumaZHub", ConfigurationSaving = { Enabled = false } })
 
 local GUIVisible = true
 openButton.MouseButton1Click:Connect(function()
