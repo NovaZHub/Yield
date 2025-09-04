@@ -6,7 +6,7 @@ local AutoBuyItens = false
 
 -- Criar Janela
 local Window = Rayfield:CreateWindow({
-    Name = "NovaZHub | Auto Farm 💀",
+    Name = "LumaZHub| Build a Plane",
     LoadingTitle = "Build a Plane Hub",
     LoadingSubtitle = "NovaZHub",
     ConfigurationSaving = {
