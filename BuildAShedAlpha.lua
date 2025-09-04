@@ -45,7 +45,7 @@ end)
 local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
 
 local win = redzlib:MakeWindow({
-    Title = "NovaZHub | Build a shed ( Alpha Script",
+    Title = "LumaZHub | Build a shed ( Alpha Script",
     SubTitle = "By Carlos",
     SaveFolder = "BuildAShedAutoFarm"
 })
