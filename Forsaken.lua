@@ -198,40 +198,78 @@ MainTab:CreateToggle({
 	end
 })
 
---// TOOL ESP
-local toolhighlightActive = false
-local function highlighttools(state)
-	toolhighlightActive = state
-	local function applyHighlight(tool)
-		if toolhighlightActive then
-			local h = tool:FindFirstChild("ToolHighlight")
-			if not h then
-				h = Instance.new("Highlight", tool)
-				h.Name = "ToolHighlight"
-				h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-				if tool.Name == "Medkit" then h.FillColor = Color3.fromRGB(0,255,0)
-				elseif tool.Name == "BloxyCola" then h.FillColor = Color3.fromRGB(88, 57, 39)
-				else h.FillColor = Color3.fromRGB(255,255,255) end
-			end
-		else
-			local h = tool:FindFirstChild("ToolHighlight")
-			if h then h:Destroy() end
-		end
-	end
-	for _, v in pairs(workspace.Map.Ingame:GetChildren()) do
-		if v:IsA("Tool") then applyHighlight(v) end
-	end
-	workspace.Map.Ingame.ChildAdded:Connect(function(child)
-		if child:IsA("Tool") then applyHighlight(child) end
-	end)
+--// ESP TOOL (FIXED)
+local ToolESPEnabled = false
+local ToolESPConnections = {}
+
+local function createToolESP(tool)
+    if tool:FindFirstChild("ToolESP") then return end
+
+    -- Highlight
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "ToolESP"
+    highlight.Parent = tool
+    highlight.FillColor = Color3.fromRGB(0, 255, 0)
+    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+    highlight.FillTransparency = 0.5
+    highlight.OutlineTransparency = 0
+
+    -- Nome
+    local adornee = tool:FindFirstChildWhichIsA("BasePart")
+    if adornee then
+        local billboard = Instance.new("BillboardGui")
+        billboard.Name = "ToolName"
+        billboard.Parent = tool
+        billboard.Size = UDim2.new(0, 100, 0, 30)
+        billboard.Adornee = adornee
+        billboard.AlwaysOnTop = true
+
+        local text = Instance.new("TextLabel")
+        text.Size = UDim2.new(1, 0, 1, 0)
+        text.BackgroundTransparency = 1
+        text.Text = tool.Name
+        text.TextColor3 = Color3.fromRGB(0, 255, 0)
+        text.TextStrokeTransparency = 0
+        text.Font = Enum.Font.SourceSansBold
+        text.TextScaled = true
+        text.Parent = billboard
+    end
+end
+
+local function enableToolESP()
+    ToolESPEnabled = true
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Tool") then
+            createToolESP(obj)
+        end
+    end
+    ToolESPConnections["Added"] = workspace.DescendantAdded:Connect(function(obj)
+        if ToolESPEnabled and obj:IsA("Tool") then
+            createToolESP(obj)
+        end
+    end)
+end
+
+local function disableToolESP()
+    ToolESPEnabled = false
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Tool") then
+            if obj:FindFirstChild("ToolESP") then obj.ToolESP:Destroy() end
+            if obj:FindFirstChild("ToolName") then obj.ToolName:Destroy() end
+        end
+    end
+    for _, conn in pairs(ToolESPConnections) do
+        conn:Disconnect()
+    end
+    ToolESPConnections = {}
 end
 
 MainTab:CreateToggle({
-	Name = "Tool ESP (Itens como Medkit)",
-	CurrentValue = false,
-	Callback = function(Value)
-		highlighttools(Value)
-	end
+    Name = "ESP Tool (Fixed)",
+    CurrentValue = false,
+    Callback = function(Value)
+        if Value then enableToolESP() else disableToolESP() end
+    end
 })
 
 --// ESP GENERATOR
