@@ -5,7 +5,7 @@ local player = Players.LocalPlayer
 local PlayerGui = player:WaitForChild("PlayerGui")
 
 local introGui = Instance.new("ScreenGui")
-introGui.Name = "NovaZHubIntro"
+introGui.Name = "KyraZHubIntro"
 introGui.IgnoreGuiInset = true
 introGui.ResetOnSpawn = false
 introGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -78,7 +78,7 @@ end)
 
 --// RAYFIELD GUI
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-local Window = Rayfield:CreateWindow({ Name = "LumaZHub", ConfigurationSaving = { Enabled = false } })
+local Window = Rayfield:CreateWindow({ Name = "KyraZHub", ConfigurationSaving = { Enabled = false } })
 
 local GUIVisible = true
 openButton.MouseButton1Click:Connect(function()
