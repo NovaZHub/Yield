@@ -115,7 +115,7 @@ MainTab:CreateButton({
 
 -- 🔁 Auto Refresh system (every 2 seconds)
 task.spawn(function()
-    while task.wait(1) do
+    while task.wait(20) do
         if ToolDropdown then
             ToolDropdown:Refresh(GetAllTools(), true)
         end
