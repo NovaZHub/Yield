@@ -4,7 +4,7 @@ local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 local Window = Rayfield:CreateWindow({
    Name = "NovaZHub | Tool Picker",
    LoadingTitle = "NovaZHub",
-   LoadingSubtitle = "By Carlos",
+   LoadingSubtitle = "NovaZHub",
    ConfigurationSaving = {
       Enabled = false,
    },
