@@ -105,10 +105,19 @@ MainTab:CreateButton({
     end,
 })
 
--- Button to refresh Tool list
+-- Button to manually refresh Tool list
 MainTab:CreateButton({
     Name = "🔄 Refresh Tool List",
     Callback = function()
         ToolDropdown:Refresh(GetAllTools(), true)
     end,
 })
+
+-- 🔁 Auto Refresh system (every 2 seconds)
+task.spawn(function()
+    while task.wait(2) do
+        if ToolDropdown then
+            ToolDropdown:Refresh(GetAllTools(), true)
+        end
+    end
+end)
