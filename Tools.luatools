@@ -4,7 +4,7 @@ local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 local Window = Rayfield:CreateWindow({
    Name = "NovaZHub | Tool Picker",
    LoadingTitle = "NovaZHub",
-   LoadingSubtitle = "NovaZHub",
+   LoadingSubtitle = "By Carlos",
    ConfigurationSaving = {
       Enabled = false,
    },
@@ -113,7 +113,7 @@ MainTab:CreateButton({
     end,
 })
 
--- 🔁 Auto Refresh system (every 2 seconds)
+-- 🔁 Auto Refresh system (every 20 seconds)
 task.spawn(function()
     while task.wait(20) do
         if ToolDropdown then
