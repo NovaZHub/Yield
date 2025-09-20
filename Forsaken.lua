@@ -338,7 +338,7 @@ local function stopSafeAutoGen()
 end
 
 GeneratorTab:CreateToggle({
-	Name = "Auto Generator (Turbo e Seguro)",
+	Name = "Auto Generator",
 	CurrentValue = false,
 	Callback = function(Value)
 		runAutoGen = Value
