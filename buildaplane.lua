@@ -3,10 +3,12 @@ local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
 local AutoFarm = false
 local AutoBuyItens = false
+local AutoBloodMoon = false
+local AutoAurora = false
 
 -- Criar Janela
 local Window = Rayfield:CreateWindow({
-    Name = "LumaZHub| Build a Plane",
+    Name = "NovaZHub| Build a Plane",
     LoadingTitle = "Build a Plane Hub",
     LoadingSubtitle = "NovaZHub",
     ConfigurationSaving = {
@@ -20,11 +22,11 @@ local Window = Rayfield:CreateWindow({
     KeySystem = false
 })
 
--- Aba principal
+-- Aba Main
 local MainTab = Window:CreateTab("Main", 4483362458)
 
 MainTab:CreateToggle({
-    Name = "Ativar Auto Farm 💀",
+    Name = "Auto Farm 💀",
     CurrentValue = false,
     Flag = "AutoFarmToggle",
     Callback = function(Value)
@@ -63,7 +65,7 @@ MainTab:CreateToggle({
 local ItensTab = Window:CreateTab("Itens", 4483362458)
 
 ItensTab:CreateToggle({
-    Name = "Auto Buy Todos os Itens 🧱",
+    Name = "Auto Buy all itens 🧱",
     CurrentValue = false,
     Flag = "AutoBuyItensToggle",
     Callback = function(Value)
@@ -88,20 +90,19 @@ ItensTab:CreateToggle({
     end
 })
 
--- Aba Blood Moon
-local BloodMoonTab = Window:CreateTab("Blood Moon", 4483362458)
-
-local AutoBloodMoon = false
+-- Aba Events (antes Blood Moon)
+local EventsTab = Window:CreateTab("Events", 4483362458)
 local r = game:GetService("ReplicatedStorage").Remotes
 
-BloodMoonTab:CreateToggle({
+-- Auto GET Inf Blood coin and spin
+EventsTab:CreateToggle({
     Name = "Auto GET Inf Blood coin and spin",
     CurrentValue = false,
     Flag = "AutoBloodMoonToggle",
     Callback = function(Value)
         AutoBloodMoon = Value
         if AutoBloodMoon then
-            Rayfield:Notify({Title = "Blood Moon Ativado", Content = "Auto GET Inf Blood coin and spin ligado.", Duration = 5})
+            Rayfield:Notify({Title = "Events Ativado", Content = "Auto GET Inf Blood coin and spin ligado.", Duration = 5})
 
             task.spawn(function()
                 for i = 1, 303 do
@@ -131,7 +132,31 @@ BloodMoonTab:CreateToggle({
                 end
             end)
         else
-            Rayfield:Notify({Title = "Blood Moon Desativado", Content = "Auto GET Inf Blood coin and spin desligado.", Duration = 4})
+            Rayfield:Notify({Title = "Events Desativado", Content = "Auto GET Inf Blood coin and spin desligado.", Duration = 4})
+        end
+    end
+})
+
+-- Auto Infinite Aurora Gem
+EventsTab:CreateToggle({
+    Name = "Auto Infinite Aurora Gem 💎",
+    CurrentValue = false,
+    Flag = "AutoAuroraToggle",
+    Callback = function(Value)
+        AutoAurora = Value
+        if AutoAurora then
+            Rayfield:Notify({Title = "Aurora Gem Ativado", Content = "Coletando Aurora Gems infinitamente...", Duration = 5})
+            task.spawn(function()
+                while AutoAurora do
+                    pcall(function()
+                        local args = { Instance.new("Part", nil) }
+                        game:GetService("ReplicatedStorage").Remotes.UIEvents.AuroraCollect:FireServer(unpack(args))
+                    end)
+                    task.wait(0.0001)
+                end
+            end)
+        else
+            Rayfield:Notify({Title = "Aurora Gem Desativado", Content = "Parou de coletar Aurora Gems.", Duration = 4})
         end
     end
 })
