@@ -127,7 +127,7 @@ MainTab:CreateToggle({
 -- Slider tamanho
 MainTab:CreateSlider({
     Name = "Hitbox Size",
-    Range = {5,30},
+    Range = {5,90},
     Increment = 1,
     Suffix = "Size",
     CurrentValue = 15,
