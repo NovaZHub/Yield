@@ -198,14 +198,11 @@ MainTab:CreateToggle({
 	end
 })
 
---// ESP TOOL (FIXED)
+--// ESP TOOL
 local ToolESPEnabled = false
 local ToolESPConnections = {}
-
 local function createToolESP(tool)
     if tool:FindFirstChild("ToolESP") then return end
-
-    -- Highlight
     local highlight = Instance.new("Highlight")
     highlight.Name = "ToolESP"
     highlight.Parent = tool
@@ -213,8 +210,6 @@ local function createToolESP(tool)
     highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
     highlight.FillTransparency = 0.5
     highlight.OutlineTransparency = 0
-
-    -- Nome
     local adornee = tool:FindFirstChildWhichIsA("BasePart")
     if adornee then
         local billboard = Instance.new("BillboardGui")
@@ -223,7 +218,6 @@ local function createToolESP(tool)
         billboard.Size = UDim2.new(0, 100, 0, 30)
         billboard.Adornee = adornee
         billboard.AlwaysOnTop = true
-
         local text = Instance.new("TextLabel")
         text.Size = UDim2.new(1, 0, 1, 0)
         text.BackgroundTransparency = 1
@@ -235,7 +229,6 @@ local function createToolESP(tool)
         text.Parent = billboard
     end
 end
-
 local function enableToolESP()
     ToolESPEnabled = true
     for _, obj in ipairs(workspace:GetDescendants()) do
@@ -249,7 +242,6 @@ local function enableToolESP()
         end
     end)
 end
-
 local function disableToolESP()
     ToolESPEnabled = false
     for _, obj in ipairs(workspace:GetDescendants()) do
@@ -263,14 +255,43 @@ local function disableToolESP()
     end
     ToolESPConnections = {}
 end
-
 MainTab:CreateToggle({
-    Name = "ESP Tool (Fixed)",
+    Name = "ESP Tool",
     CurrentValue = false,
     Callback = function(Value)
         if Value then enableToolESP() else disableToolESP() end
     end
 })
+
+--// TP WALK
+local tpDistance = 10
+local walking = false
+MainTab:CreateToggle({
+    Name = "TP Walk (Limited until October 14th)",
+    CurrentValue = false,
+    Callback = function(Value)
+        walking = Value
+    end
+})
+MainTab:CreateSlider({
+    Name = "distance TP Walk",
+    Range = {5, 100},
+    Increment = 5,
+    Suffix = " studs",
+    CurrentValue = tpDistance,
+    Callback = function(Value)
+        tpDistance = Value
+    end
+})
+RunService.RenderStepped:Connect(function()
+    if walking and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local HRP = Players.LocalPlayer.Character.HumanoidRootPart
+        local moveDir = Players.LocalPlayer.Character.Humanoid.MoveDirection
+        if moveDir.Magnitude > 0 then
+            HRP.CFrame = HRP.CFrame + (moveDir * tpDistance * 0.1)
+        end
+    end
+end)
 
 --// ESP GENERATOR
 local generatorESPEnabled = false
@@ -291,7 +312,6 @@ local function toggleGeneratorESP(state)
 		end
 	end
 end
-
 GeneratorTab:CreateToggle({
 	Name = "ESP Generator",
 	CurrentValue = false,
@@ -304,11 +324,9 @@ local autoGenThread = nil
 local function isSafeGenerator(gen)
 	return gen:FindFirstChild("Remotes") and gen.Remotes:FindFirstChild("RE")
 end
-
 local function getRandomDelay()
 	return math.random(4, 7) / 10
 end
-
 local function safeActivate(gen)
 	if isSafeGenerator(gen) then
 		pcall(function()
@@ -316,7 +334,6 @@ local function safeActivate(gen)
 		end)
 	end
 end
-
 local function startSafeAutoGen()
 	if autoGenThread then task.cancel(autoGenThread) end
 	autoGenThread = task.spawn(function()
@@ -331,12 +348,10 @@ local function startSafeAutoGen()
 		end
 	end)
 end
-
 local function stopSafeAutoGen()
 	runAutoGen = false
 	if autoGenThread then task.cancel(autoGenThread) end
 end
-
 GeneratorTab:CreateToggle({
 	Name = "Auto Generator",
 	CurrentValue = false,
