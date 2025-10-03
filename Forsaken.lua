@@ -180,7 +180,7 @@ MainTab:CreateToggle({
 --// INFINITE STAMINA
 local staminaThread
 MainTab:CreateToggle({
-	Name = "Infinite Stamina",
+	Name = "Inf stamina",
 	CurrentValue = false,
 	Callback = function(Value)
 		if Value then
