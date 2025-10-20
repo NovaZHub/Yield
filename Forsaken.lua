@@ -80,7 +80,7 @@ end)
 
 --// RAYFIELD GUI
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-local Window = Rayfield:CreateWindow({ Name = "NovaZHub| Dev Script test", ConfigurationSaving = { Enabled = false } })
+local Window = Rayfield:CreateWindow({ Name = "NovaZHub", ConfigurationSaving = { Enabled = false } })
 
 local GUIVisible = true
 openButton.MouseButton1Click:Connect(function()
@@ -464,7 +464,7 @@ local function stopAutoKill()
 end
 
 KillersTab:CreateToggle({
-    Name = "Auto Kill Nearby",
+    Name = "Auto Tp Nearby survivor",
     CurrentValue = false,
     Callback = function(Value)
         AutoKillEnabled = Value
