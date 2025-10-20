@@ -37,16 +37,18 @@ local delayPerChar = 0.12
 task.spawn(function()
 	for i = 1, #fullText do
 		label.Text = string.sub(fullText, 1, i)
-		typingSound:Play()
+		pcall(function() typingSound:Play() end)
 		task.wait(delayPerChar)
 	end
 end)
 
 task.delay(#fullText * delayPerChar + 1, function()
-	TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
-	TweenService:Create(bg, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+	pcall(function()
+		TweenService:Create(label, TweenInfo.new(1), {TextTransparency = 1}):Play()
+		TweenService:Create(bg, TweenInfo.new(1), {BackgroundTransparency = 1}):Play()
+	end)
 	task.wait(1)
-	introGui:Destroy()
+	pcall(function() introGui:Destroy() end)
 end)
 
 --// BOTÃO FLUTUANTE
@@ -78,11 +80,11 @@ end)
 
 --// RAYFIELD GUI
 local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
-local Window = Rayfield:CreateWindow({ Name = "KyraZHub", ConfigurationSaving = { Enabled = false } })
+local Window = Rayfield:CreateWindow({ Name = "NovaZHub| Dev Script test", ConfigurationSaving = { Enabled = false } })
 
 local GUIVisible = true
 openButton.MouseButton1Click:Connect(function()
-	clickSound:Play()
+	pcall(function() clickSound:Play() end)
 	GUIVisible = not GUIVisible
 	Window:SetVisible(GUIVisible)
 end)
@@ -95,7 +97,11 @@ local GeneratorTab = Window:CreateTab("Generators", 4483362458)
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
+local Lighting = game:GetService("Lighting")
+local VirtualUser = game:GetService("VirtualUser")
+local workspace = game:GetService("Workspace")
 
+-- ====== O SEU CÓDIGO EXISTENTE (ESP, Stamina, ToolESP, TPWalk, Generator, AutoGen) ======
 --// ESP HAWK TUAH
 local ESPConnection
 local function createOutlineESP(model, outlineColor, fillColor)
@@ -131,9 +137,12 @@ local function updateHealthIndicators()
 			local humanoid = char:FindFirstChildOfClass("Humanoid")
 			local head = char:FindFirstChild("Head")
 			if humanoid and head then
-				local label = head:FindFirstChild("HealthGui"):FindFirstChildWhichIsA("TextLabel")
-				if label then
-					label.Text = math.floor(humanoid.Health) .. "/" .. humanoid.MaxHealth
+				local healthGui = head:FindFirstChild("HealthGui")
+				if healthGui then
+					local label = healthGui:FindFirstChildWhichIsA("TextLabel")
+					if label then
+						label.Text = math.floor(humanoid.Health) .. "/" .. humanoid.MaxHealth
+					end
 				end
 			end
 		end
@@ -142,10 +151,10 @@ end
 
 local function startESP()
 	ESPConnection = RunService.Heartbeat:Connect(function()
-		for _, plr in Players:GetPlayers() do
+		for _, plr in pairs(Players:GetPlayers()) do
 			local char = plr.Character
 			if char then
-				for _, v in char:GetChildren() do if v:IsA("Highlight") then v:Destroy() end end
+				for _, v in ipairs(char:GetChildren()) do if v:IsA("Highlight") then v:Destroy() end end
 				local humanoid = char:FindFirstChildOfClass("Humanoid")
 				if humanoid then
 					local hp = humanoid.MaxHealth
@@ -162,9 +171,9 @@ end
 
 local function stopESP()
 	if ESPConnection then ESPConnection:Disconnect() end
-	for _, v in workspace:GetDescendants() do
+	for _, v in ipairs(workspace:GetDescendants()) do
 		if v:IsA("Highlight") or v.Name == "HealthGui" then
-			v:Destroy()
+			pcall(function() v:Destroy() end)
 		end
 	end
 end
@@ -184,14 +193,22 @@ MainTab:CreateToggle({
 	CurrentValue = false,
 	Callback = function(Value)
 		if Value then
-			local m = require(ReplicatedStorage.Systems.Character.Game.Sprinting)
-			m.Stamina = 100
-			staminaThread = task.spawn(function()
-				while true do
-					if m.Stamina <= 5 then m.Stamina = 20 end
-					task.wait(0.1)
+			local success, m = pcall(function() return require(ReplicatedStorage.Systems.Character.Game.Sprinting) end)
+			if success and m then
+				if type(m) == "table" then
+					m.Stamina = 100
+				elseif type(m) == "userdata" then
+					pcall(function() m.Stamina = 100 end)
 				end
-			end)
+				staminaThread = task.spawn(function()
+					while true do
+						pcall(function()
+							if m and m.Stamina and m.Stamina <= 5 then m.Stamina = 20 end
+						end)
+						task.wait(0.1)
+					end
+				end)
+			end
 		else
 			if staminaThread then task.cancel(staminaThread) end
 		end
@@ -246,12 +263,12 @@ local function disableToolESP()
     ToolESPEnabled = false
     for _, obj in ipairs(workspace:GetDescendants()) do
         if obj:IsA("Tool") then
-            if obj:FindFirstChild("ToolESP") then obj.ToolESP:Destroy() end
-            if obj:FindFirstChild("ToolName") then obj.ToolName:Destroy() end
+            if obj:FindFirstChild("ToolESP") then pcall(function() obj.ToolESP:Destroy() end) end
+            if obj:FindFirstChild("ToolName") then pcall(function() obj.ToolName:Destroy() end) end
         end
     end
     for _, conn in pairs(ToolESPConnections) do
-        conn:Disconnect()
+        pcall(function() conn:Disconnect() end)
     end
     ToolESPConnections = {}
 end
@@ -267,7 +284,7 @@ MainTab:CreateToggle({
 local tpDistance = 10
 local walking = false
 MainTab:CreateToggle({
-    Name = "TP Walk (Limited until October 14th)",
+    Name = "TP Walk",
     CurrentValue = false,
     Callback = function(Value)
         walking = Value
@@ -287,7 +304,7 @@ RunService.RenderStepped:Connect(function()
     if walking and Players.LocalPlayer.Character and Players.LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
         local HRP = Players.LocalPlayer.Character.HumanoidRootPart
         local moveDir = Players.LocalPlayer.Character.Humanoid.MoveDirection
-        if moveDir.Magnitude > 0 then
+        if moveDir and moveDir.Magnitude > 0 then
             HRP.CFrame = HRP.CFrame + (moveDir * tpDistance * 0.1)
         end
     end
@@ -298,16 +315,19 @@ local generatorESPEnabled = false
 local generatorHighlights = {}
 local function toggleGeneratorESP(state)
 	generatorESPEnabled = state
-	for _, h in pairs(generatorHighlights) do h:Destroy() end
+	for _, h in pairs(generatorHighlights) do pcall(function() h:Destroy() end) end
 	table.clear(generatorHighlights)
 	if state then
-		for _, gen in pairs(workspace.Map.Ingame.Map:GetChildren()) do
-			if gen:IsA("Model") and gen.Name == "Generator" then
-				local highlight = Instance.new("Highlight", gen)
-				highlight.FillColor = Color3.fromRGB(255, 255, 0)
-				highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
-				highlight.FillTransparency = 0.5
-				table.insert(generatorHighlights, highlight)
+		local ok, map = pcall(function() return workspace.Map.Ingame.Map end)
+		if ok and map then
+			for _, gen in pairs(map:GetChildren()) do
+				if gen:IsA("Model") and gen.Name == "Generator" then
+					local highlight = Instance.new("Highlight", gen)
+					highlight.FillColor = Color3.fromRGB(255, 255, 0)
+					highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
+					highlight.FillTransparency = 0.5
+					table.insert(generatorHighlights, highlight)
+				end
 			end
 		end
 	end
@@ -338,10 +358,13 @@ local function startSafeAutoGen()
 	if autoGenThread then task.cancel(autoGenThread) end
 	autoGenThread = task.spawn(function()
 		while runAutoGen do
-			for _, gen in ipairs(workspace.Map.Ingame.Map:GetChildren()) do
-				if gen.Name == "Generator" and isSafeGenerator(gen) then
-					safeActivate(gen)
-					task.wait(getRandomDelay())
+			local ok, children = pcall(function() return workspace.Map.Ingame.Map:GetChildren() end)
+			if ok and children then
+				for _, gen in ipairs(children) do
+					if gen.Name == "Generator" and isSafeGenerator(gen) then
+						safeActivate(gen)
+						task.wait(getRandomDelay())
+					end
 				end
 			end
 			task.wait(0.05)
@@ -350,7 +373,8 @@ local function startSafeAutoGen()
 end
 local function stopSafeAutoGen()
 	runAutoGen = false
-	if autoGenThread then task.cancel(autoGenThread) end
+	if autoGenThread then pcall(task.cancel, autoGenThread) end
+	autoGenThread = nil
 end
 GeneratorTab:CreateToggle({
 	Name = "Auto Generator",
@@ -360,3 +384,147 @@ GeneratorTab:CreateToggle({
 		if Value then startSafeAutoGen() else stopSafeAutoGen() end
 	end
 })
+
+-- ====== KILLERS TAB + AUTO KILL SIMPLES ======
+local KillersTab = Window:CreateTab("Killers", 4483362458)
+
+local AutoKillEnabled = false
+local AutoKillThread = nil
+local KILL_DISTANCE = 50
+local TELEPORT_DISTANCE_FROM_TARGET = 2.5
+
+local function getAlivePlayers()
+    local alive = {}
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player and otherPlayer.Character and otherPlayer.Character:FindFirstChild("Humanoid") then
+            local humanoid = otherPlayer.Character.Humanoid
+            if humanoid.Health > 0 then
+                table.insert(alive, otherPlayer)
+            end
+        end
+    end
+    return alive
+end
+
+local function getClosestAlivePlayer()
+    local closest, shortestDistance = nil, KILL_DISTANCE
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return nil end
+    local hrp = player.Character.HumanoidRootPart
+    for _, plr in pairs(getAlivePlayers()) do
+        if plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local dist = (plr.Character.HumanoidRootPart.Position - hrp.Position).Magnitude
+            if dist < shortestDistance then
+                shortestDistance = dist
+                closest = plr
+            end
+        end
+    end
+    return closest
+end
+
+local function teleportNear(targetPlayer)
+    if not targetPlayer or not targetPlayer.Character or not targetPlayer.Character:FindFirstChild("HumanoidRootPart") then return end
+    local targetHRP = targetPlayer.Character.HumanoidRootPart
+    local hrp = player.Character.HumanoidRootPart
+    local dir = (hrp.Position - targetHRP.Position).Unit
+    if dir.Magnitude == 0 then dir = Vector3.new(0,0,1) end
+    local desiredPos = targetHRP.Position + dir * TELEPORT_DISTANCE_FROM_TARGET + Vector3.new(0,1,0)
+    pcall(function() hrp.CFrame = CFrame.new(desiredPos) end)
+end
+
+local function doSlash()
+    pcall(function()
+        VirtualUser:CaptureController()
+        VirtualUser:Button1Down(Vector2.new(0,0))
+        task.wait(0.03)
+        VirtualUser:Button1Up(Vector2.new(0,0))
+    end)
+end
+
+local function startAutoKill()
+    AutoKillThread = task.spawn(function()
+        while AutoKillEnabled do
+            local target = getClosestAlivePlayer()
+            if target then
+                teleportNear(target)
+                task.wait(0.05)
+                doSlash()
+            end
+            task.wait(0.1)
+        end
+    end)
+end
+
+local function stopAutoKill()
+    AutoKillEnabled = false
+    if AutoKillThread then
+        pcall(task.cancel, AutoKillThread)
+        AutoKillThread = nil
+    end
+end
+
+KillersTab:CreateToggle({
+    Name = "Auto Kill Nearby",
+    CurrentValue = false,
+    Callback = function(Value)
+        AutoKillEnabled = Value
+        if Value then
+            startAutoKill()
+        else
+            stopAutoKill()
+        end
+    end
+})
+
+-- ====== MISC TAB (AntiLag + FullBright + Shaders) ======
+local MiscTab = Window:CreateTab("Misc", 4483362458)
+
+-- AntiLag
+local AntiLagEnabled = false
+local savedDescendants = {}
+local function enableAntiLag()
+	AntiLagEnabled = true
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Beam") or v:IsA("Smoke") then
+			savedDescendants[v] = v.Enabled
+			v.Enabled = false
+		end
+	end
+end
+local function disableAntiLag()
+	AntiLagEnabled = false
+	for v, val in pairs(savedDescendants) do
+		if v and v.Parent then v.Enabled = val end
+	end
+	savedDescendants = {}
+end
+MiscTab:CreateToggle({
+	Name = "AntiLag",
+	CurrentValue = false,
+	Callback = function(Value)
+		if Value then enableAntiLag() else disableAntiLag() end
+	end
+})
+
+-- FullBright
+local savedLighting = {}
+MiscTab:CreateButton({
+	Name = "FullBright",
+	Callback = function()
+		savedLighting.Brightness = Lighting.Brightness
+		savedLighting.Ambient = Lighting.Ambient
+		savedLighting.OutdoorAmbient = Lighting.OutdoorAmbient
+		Lighting.Brightness = 2
+		Lighting.Ambient = Color3.new(1,1,1)
+		Lighting.OutdoorAmbient = Color3.new(1,1,1)
+	end
+})
+
+-- Shader reset
+MiscTab:CreateButton({
+	Name = "Reset Shaders",
+	Callback = function()
+		pcall(function() game:GetService("Lighting").ColorCorrection:Destroy() end)
+	end
+})
+
